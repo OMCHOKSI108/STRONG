@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Image to Text | AI Generator{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="Generate text descriptions from images using AI">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Image to Text Generator</h1>
+    <p>Upload an image or provide a URL to generate an AI-powered description</p>
+</div>
+
+<div class="image-to-text-container">
+    <form action="{{ url_for('generate_caption') }}" method="post" enctype="multipart/form-data" id="imageToTextForm">
+        <div class="form-tabs">
+            <button type="button" class="tab-btn active" data-tab="upload">Upload Image</button>
+            <button type="button" class="tab-btn" data-tab="url">Image URL</button>
+        </div>
+        
+        <div class="tab-content">
+            <div class="tab-pane active" id="upload-tab">
+                <div class="form-group">
+                    <label for="image">Upload Image:</label>
+                    <div class="file-input-container">
+                        <input type="file" id="image" name="image" accept="image/*">
+                        <div class="file-preview-container" id="filePreview">
+                            <div class="file-placeholder">
+                                <span class="icon">📁</span>
+                                <span>Drag & drop or click to select</span>
+                            </div>
+                            <img id="imagePreview" style="display: none;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-pane" id="url-tab">
+                <div class="form-group">
+                    <label for="image_url">Image URL:</label>
+                    <input type="url" id="image_url" name="image_url" placeholder="https://example.com/image.jpg">
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn primary" id="generateBtn">
+                <span class="btn-text">Generate Caption</span>
+                <span class="btn-loading" id="loadingIndicator">
+                    <span class="spinner"></span> Analyzing...
+                </span>
+            </button>
+        </div>
+    </form>
+    
+    <div class="result-container {% if image_path %}has-result{% endif %}">
+        {% if image_path %}
+            <div class="result-card">
+                <div class="result-layout">
+                    <div class="image-display">
+                        <h3>Image</h3>
+                        <img src="{{ url_for('static', filename=image_path) }}" alt="Uploaded or URL image">
+                    </div>
+                    
+                    <div class="caption-display">
+                        <h3>Generated Caption</h3>
+                        <div class="caption-text">
+                            {% if caption %}
+                                <p>{{ caption }}</p>
+                            {% else %}
+                                <p class="no-result">No caption generated. Please try again.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('imageToTextForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const fileInput = document.getElementById('image');
+        const imagePreview = document.getElementById('imagePreview');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        
+        // Handle form submission and loading state
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Basic validation
+                const activeTab = document.querySelector('.tab-pane.active');
+                if (activeTab.id === 'upload-tab' && (!fileInput.files || fileInput.files.length === 0)) {
+                    e.preventDefault();
+                    alert('Please select an image to upload');
+                    return false;
+                } else if (activeTab.id === 'url-tab' && !document.getElementById('image_url').value) {
+                    e.preventDefault();
+                    alert('Please enter an image URL');
+                    return false;
+                }
+                
+                // Show loading state
+                generateBtn.classList.add('loading');
+                generateBtn.disabled = true;
+            });
+        }
+        
+        // Handle image preview
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                        document.querySelector('.file-placeholder').style.display = 'none';
+                    };
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+        
+        // Tab functionality
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabTarget = btn.getAttribute('data-tab');
+                
+                // Update active tab button
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update active tab content
+                tabPanes.forEach(pane => {
+                    pane.classList.remove('active');
+                    if (pane.id === `${tabTarget}-tab`) {
+                        pane.classList.add('active');
+                    }
+                });
+                
+                // Clear inputs in the inactive tab
+                if (tabTarget === 'upload') {
+                    document.getElementById('image_url').value = '';
+                } else {
+                    fileInput.value = '';
+                    imagePreview.style.display = 'none';
+                    document.querySelector('.file-placeholder').style.display = 'flex';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}AI Image & Text Generator{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>AI-Powered Image & Text Generator</h1>
+    <p>Generate stunning images from text prompts or create detailed descriptions of images</p>
+    
+    <div class="feature-cards">
+        <div class="card">
+            <div class="card-icon text-to-image-icon">🖼️</div>
+            <h2>Text to Image</h2>
+            <p>Transform your text prompts into AI-generated images using cutting-edge stable diffusion technology.</p>
+            <a href="{{ url_for('text_to_image_page') }}" class="btn primary">Create Images</a>
+        </div>
+        
+        <div class="card">
+            <div class="card-icon image-to-text-icon">📝</div>
+            <h2>Image to Text</h2>
+            <p>Generate detailed and accurate captions for any image by uploading a file or providing a URL.</p>
+            <a href="{{ url_for('image_to_text_page') }}" class="btn secondary">Create Captions</a>
+        </div>
+    </div>
+</div>
+
+<div class="tech-info">
+    <h3>Powered By</h3>
+    <div class="tech-stack">
+        <div class="tech-item">
+            <span class="tech-name">Flask</span>
+            <span class="tech-desc">Backend Framework</span>
+        </div>
+        <div class="tech-item">
+            <span class="tech-name">Stable Diffusion</span>
+            <span class="tech-desc">Image Generation</span>
+        </div>
+        <div class="tech-item">
+            <span class="tech-name">GIT-Large-COCO</span>
+            <span class="tech-desc">Image Captioning</span>
+        </div>
+        <div class="tech-item">
+            <span class="tech-name">Hugging Face</span>
+            <span class="tech-desc">AI Models & API</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

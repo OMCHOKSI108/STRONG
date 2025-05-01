@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Text to Image | AI Generator{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="Generate images from text descriptions using AI">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Text to Image Generator</h1>
+    <p>Enter a text prompt to generate an AI-powered image</p>
+</div>
+
+<div class="text-to-image-container">
+    <form action="{{ url_for('generate_image') }}" method="post" id="textToImageForm">
+        <div class="form-group">
+            <label for="prompt">Your Text Prompt:</label>
+            <textarea 
+                id="prompt" 
+                name="prompt" 
+                rows="3" 
+                placeholder="Describe the image you want to generate (e.g., 'a futuristic cyberpunk city with neon lights')"
+                required>{{ prompt if prompt else '' }}</textarea>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn primary" id="generateBtn">
+                <span class="btn-text">Generate Image</span>
+                <span class="btn-loading" id="loadingIndicator">
+                    <span class="spinner"></span> Generating...
+                </span>
+            </button>
+        </div>
+    </form>
+    
+    <div class="result-container {% if image_path %}has-result{% endif %}">
+        {% if image_path %}
+            <div class="result-card">
+                <h3>Generated Image</h3>
+                <div class="image-result">
+                    <img src="{{ url_for('static', filename=image_path) }}" alt="Generated image from text prompt">
+                </div>
+                <div class="prompt-details">
+                    <strong>Prompt:</strong> {{ prompt }}
+                </div>
+                <a href="{{ url_for('static', filename=image_path) }}" download class="btn secondary download-btn">
+                    Download Image
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="tips-container">
+    <h3>Tips for Better Results</h3>
+    <ul class="tips-list">
+        <li>Be specific and detailed in your descriptions</li>
+        <li>Include artistic styles (e.g., "oil painting", "digital art", "photorealistic")</li>
+        <li>Mention lighting, perspective, and composition</li>
+        <li>Use adjectives to describe colors, textures, and mood</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('textToImageForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        
+        if (form) {
+            form.addEventListener('submit', function() {
+                // Show loading state
+                generateBtn.classList.add('loading');
+                
+                // Disable the button to prevent multiple submissions
+                generateBtn.disabled = true;
+            });
+        }
+    });
+</script>
+{% endblock %}
